@@ -1,0 +1,9 @@
+{
+    "dependencies": {
+        "aws-sdk": ">= 2.0.9",
+        "express": "^4.17.1",
+        "jsrender": "^1.0.6",
+        "node-uuid": ">= 1.4.1",
+        "uuid": "^8.1.0"
+    }
+}

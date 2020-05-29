@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ex2-q2
+  labels:
+    app: ex2-q2
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: ex2-q2
+  template:
+    metadata:
+      labels:
+        app: ex2-q2
+    spec:
+      containers:
+      - name: ex2-q2
+        image: galrabin/ex2_q2:1.0
+        ports:
+        - containerPort: 3000
