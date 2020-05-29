@@ -12,7 +12,7 @@ const port = 3000
 const app = express()
 
 // Create an S3 client
-let s3 = new AWS.S3({signatureVersion: 'v4'});
+let s3 = new AWS.S3({signatureVersion: 'v4', region: 'us-east-2'});
 
 // helper functions
 function chunkArray(myArray, chunk_size){
@@ -60,36 +60,37 @@ app.get('/', (req, res) => {
         }
         imagesElements += "</div>\n"
       }
-      // Get upload singed url
-      params = {
-        Bucket: bucketName,
-        Key:`${uuid.v4()}.png`,
-        Expires: 3600
+    }
+    var params = {
+      Bucket: bucketName,
+      Fields: {
+        key: `${uuid.v4()}.png`
       }
+    };
+    s3.createPresignedPost(params, function(err, data) {
+      if (err) {
+        console.error('Presigning post data encountered an error', err);
+      } else {
+        console.log('The post data is', data);
+        // Render html page
+        generalHtmlParams = {
+          images: imagesElements,
+          action: data.url,
+          key: data.fields.key,
+          xAmzCredential: data.fields['X-Amz-Credential'],
+          xAmAlgorithm: data.fields['X-Amz-Algorithm'],
+          xAmzSignature: data.fields['X-Amz-Signature'],
+          xAmzDate: data.fields['X-Amz-Date'],
+          policy: data.fields.Policy
+        };
+        console.log(generalHtmlParams);
+        var html = jsrender.renderFile(process.cwd() + '/myTemplate.html', generalHtmlParams);
+        // Page response
+        res.send(html);
       }
-      let sigendUrlPutObject = new URL(s3.getSignedUrl('getObject', params));
-      let sigendUrlPutObjectParams = sigendUrlPutObject.searchParams;
-      console.log(sigendUrlPutObject);
-      console.log(sigendUrlPutObjectParams);
-      // Render html page
-      generalHtmlParams = {
-        images: imagesElements,
-        action: sigendUrlPutObject,
-        uniqKey: params.Key,
-        protocol: sigendUrlPutObject.protocol,
-        hostname: sigendUrlPutObject.hostname,
-        xAmzCredential: sigendUrlPutObjectParams.get('X-Amz-Credential'),
-        xAmAlgorithm: sigendUrlPutObjectParams.get('X-Amz-Algorithm'),
-        xAmzDate: sigendUrlPutObjectParams.get('X-Amz-Date'),
-        xAmzSignature: sigendUrlPutObjectParams.get('X-Amz-Signature'),
-        xAmzExpires: sigendUrlPutObjectParams.get('X-Amz-Expires'),
-        xAmzSignedHeaders: sigendUrlPutObjectParams.get('X-Amz-SignedHeaders')
-      }
-      var html = jsrender.renderFile(process.cwd() + '/myTemplate.html', generalHtmlParams);
-      // Page response
-      res.send(html);
-    }  
-  ).con;
+    });
+  }  
+).con;
 })
 
 

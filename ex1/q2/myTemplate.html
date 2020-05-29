@@ -18,22 +18,39 @@
     </style>
 </head>
 <body>
-    <h1>EX1 - Q2</h1>
-    <hr>
-    <h2>Upload image</h2>
-    <form method="POS" action="{{:protocol}}//{{:hostname}}/"  enctype="multipart/form-data">
-        <br> Key to upload: <input type="text"  name="key" value="{{:uniqKey}}"/></br>
-        <br> X-Amz-Credential:<input type="text" name="X-Amz-Credential" value="{{:xAmzCredential}}"/> </br>
-        <br> X-Amz-Algorithm: <input type="text" name="X-Amz-Algorithm" value="{{:xAmAlgorithm}}"/> </br>
-        <br> X-Amz-Signature: <input type="text" name="X-Amz-Signature" value="{{:xAmzSignature}}"/> </br>
-        <br> X-Amz-Date:      <input type="text" name="X-Amz-Date" value="{{:xAmzDate}}"/> </br>
-        <br> X-Amz-SignedHeaders:  <input type="text" name="X-Amz-SignedHeaders" value="{{:xAmzSignedHeaders}}"/> </br>
-        <br> X-Amz-Expires: <input type="text" name="X-Amz-Expires" value="{{:xAmzExpires}}"/> </br>
-        <br> <input type="file"   name="file" /> </br>
+    <!-- A vertical navbar -->
+    <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+        <a class="navbar-brand" href="#">EX1 - Q2</a>
+    </nav>
+
+    <!-- Upload photo -->
+    <div class="container p-3 my-3 bg-dark text-white">
+    <h2>Upload photo</h2>
+    <form method="POST" action="https://ex1-q2-idc.s3.amazonaws.com"  enctype="multipart/form-data">
+        <div class="col-md-4 mb-3">
+        <label for="input1">Key to upload:</label>
+        <br><input type="text"  name="key" value="{{:key}}" id="input1" class="form-control" readonly/>
+        <label for="input2">X-Amz-Credential:</label>
+        <input type="text" name="X-Amz-Credential" value="{{:xAmzCredential}}" id="input2" class="form-control" readonly/>
+        <label for="input3">X-Amz-Algorithm:</label>
+        <input type="text" name="X-Amz-Algorithm" value="{{:xAmAlgorithm}}" id="input3" class="form-control" readonly/>
+        <label for="input4">X-Amz-Signature:</label>
+        <input type="text" name="X-Amz-Signature" value="{{:xAmzSignature}}" id="input4" class="form-control" readonly/>
+        <label for="input5">X-Amz-Date:</label>
+        <input type="text" name="X-Amz-Date" value="{{:xAmzDate}}" id="input5" class="form-control" readonly/>
+        <label for="inpu6">X-Amz-Date:</label>
+        <input type="text" name="Policy" value="{{:policy}}" id="input6" class="form-control" readonly/>
+        <label for="input7">File to upload:</label>
+        <input type="file" name="file" class="form-control-file" id="input7" readonly/>
+        </div>
         <!-- The elements after this will be ignored -->
-        <input type="submit" name="submit" value="Upload to Amazon S3" />
+        <input type="submit" name="submit" value="Upload to Amazon S3" class="btn btn-primary mb-2"/>
     </form>
-    <hr>
+    </div>
+
+    <!-- List photos in S3 -->
+    <div class="container p-3 my-3 bg-primary text-white">
     <h2>Photos in S3 bucket</h2>
     {{:images}}
+    </div>
 </body>
