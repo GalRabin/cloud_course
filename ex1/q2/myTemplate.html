@@ -27,7 +27,6 @@
     <div class="container p-3 my-3 bg-dark text-white">
     <h2>Upload photo</h2>
     <form method="POST" action="https://ex1-q2-idc.s3.amazonaws.com"  enctype="multipart/form-data">
-        <div class="col-md-4 mb-3">
         <label for="input1">Key to upload:</label>
         <br><input type="text"  name="key" value="{{:key}}" id="input1" class="form-control" readonly/>
         <label for="input2">X-Amz-Credential:</label>
@@ -42,7 +41,6 @@
         <input type="text" name="Policy" value="{{:policy}}" id="input6" class="form-control" readonly/>
         <label for="input7">File to upload:</label>
         <input type="file" name="file" class="form-control-file" id="input7" readonly/>
-        </div>
         <!-- The elements after this will be ignored -->
         <input type="submit" name="submit" value="Upload to Amazon S3" class="btn btn-primary mb-2"/>
     </form>
