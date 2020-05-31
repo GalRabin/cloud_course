@@ -1,10 +1,16 @@
+/** 
+* Run this script by the folowing usage - node <script_path> -f/-c
+*/
+
 
 // Load the AWS SDK for Node.js
 var AWS = require('aws-sdk');
 const camelCase = require('camelcase');
 const randoms = require('./randoms');
 const crypto = require('crypto');
-const postSensor = require('./sensorRecordPost')
+const postSensor = require('./sensorRecordPost');
+const yargs = require('yargs');
+const chalk = require('chalk');
 
 // Set the region 
 AWS.config.update({region: 'us-east-2'});
@@ -12,7 +18,7 @@ AWS.config.update({region: 'us-east-2'});
 // Create the DynamoDB service object
 var DynamoDB = new AWS.DynamoDB.DocumentClient();
 
-// Tables name
+// Tables name and partition keys
 tables ={
     recordsTable: {
         tableName: "Records",
@@ -36,6 +42,10 @@ var recordsAmount = 50;
 // All plates
 var allPlates = new Array();
 
+/** 
+* Create dynamoDB tables - Records, Customers, Sensors with right configuration.
+* @summary If the description is long, write your summary here. Otherwise, feel free to remove this.
+*/
 async function createTables(){
     var AWS = require("aws-sdk");
     var dynamodb = new AWS.DynamoDB();
@@ -50,22 +60,26 @@ async function createTables(){
                 { AttributeName: tables[table].tablePartitionKey, AttributeType: "S"},
             ],
             ProvisionedThroughput: {       
-                ReadCapacityUnits: 1, 
-                WriteCapacityUnits: 1
+                ReadCapacityUnits: 10, 
+                WriteCapacityUnits: 10
             }
         };
 
         dynamodb.createTable(params, function(err, data) {
             if (err) {
-                console.error("Unable to create table. Error JSON:", JSON.stringify(err, null, 2));
+                console.log(`Table creation - ${tables[table].tableName} - ` + chalk.red("Fail"));
             } else {
-                console.log("Created table. Table description JSON:", JSON.stringify(data, null, 2));
+                console.log(`Table creation - ${tables[table].tableName} - ` + chalk.green("Success"));
             }
         }); 
     }
 }
 
-function fillCustomerData(numberOfCustomers){
+/** 
+* Generate Cutomers entries in DynamoDB Customer tables.
+* @param {Number} numberOfCustomers - Number of customers to create.
+*/
+async function fillCustomerData(numberOfCustomers){
     for (let customer = 1; customer < numberOfCustomers; customer++) {
         partitionKey = `${tables.sensorsTable.tablePartitionKey}`
         var customerName = randoms.generateName();
@@ -73,6 +87,7 @@ function fillCustomerData(numberOfCustomers){
         allPlates = allPlates.concat(licensPlates);
         var params = {
             TableName: "Customers",
+            // Customer data
             Item: {
                 "CustomerId" : customer.toString(),
                 'Name': customerName,
@@ -82,16 +97,21 @@ function fillCustomerData(numberOfCustomers){
             }
         }
         DynamoDB.put(params, function (err) {
-                if (err) {
-                console.log("Error", err);
+            if (err) {
+                console.log(`Table ${params.TableName} - item id ${customer} - ` + chalk.red("Fail"));
             } else {
-                console.log("Success");
+                console.log(`Table ${params.TableName} - item id ${customer} - ` + chalk.green("Success"));
             }
         });
     };
 };
 
-function fillSensorsData(numberOfSensors){
+
+/** 
+* Generate sensors enries in DynamoDB Sensors tables.
+* @param {Number} numberOfSensors - Number of sensors to create.
+*/
+async function fillSensorsData(numberOfSensors){
     for (let sensor = 1; sensor < numberOfSensors; sensor++) {
         partitionKey = `${tables.sensorsTable.tablePartitionKey}`
         var params = {
@@ -104,17 +124,21 @@ function fillSensorsData(numberOfSensors){
             }
         }
         DynamoDB.put(params, function (err) {
-                if (err) {
-                console.log("Error", err);
+            if (err) {
+                console.log(`Table ${params.TableName} - item id ${sensor} - ` + chalk.red("Fail"));
             } else {
-                console.log("Success");
+                console.log(`Table ${params.TableName} - item id ${sensor} - ` + chalk.green("Success"));
             }
         });
     };
 }
 
 
-function fillRecordsData(numberOfRecords){
+/** 
+* Generate records entries in DynamoDB Records table.
+* @param {Number} numberOfRecords - Number of records to create.
+*/
+async function fillRecordsData(numberOfRecords){
     for (let record = 1; record < numberOfRecords; record++) {
         hash = crypto.getHashes();
         var plate = allPlates[randoms.getRandomInt(0, allPlates.length - 1)];
@@ -123,9 +147,42 @@ function fillRecordsData(numberOfRecords){
     };
 }
 
-// createTables();
-fillCustomerData(customersAmout);
-fillSensorsData(sensorsAmount);
-fillRecordsData(recordsAmount);
+async function main() {
+    const argv = yargs
+    .option('create', {
+        alias: 'c',
+        description: 'Create tables - Customers, Sensors, Records',
+        type: 'boolean',
+    })
+    .option('fill', {
+        alias: 'f',
+        description: 'Fill tables - Customers, Sensors, Records',
+        type: 'boolean',
+    })
+    .help()
+    .alias('help', 'h')
+    .argv;
+
+    if (argv.create){
+        createTables();
+    } else if (argv.fill) {    
+        console.log(
+`
+${chalk.blue("Summary")}:
+1. Table customers: ${customersAmout} new items.
+2. Table sensors: ${sensorsAmount} new items.
+3. Table records: ${recordsAmount} new items.
+`
+        )
+        await fillCustomerData(customersAmout);
+        await fillSensorsData(sensorsAmount);
+        await fillRecordsData(recordsAmount);
+    } else {
+        console.log("Please check usage with -h!")
+    }
+}
+
+main();
+
 
 
