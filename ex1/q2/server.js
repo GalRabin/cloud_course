@@ -6,7 +6,7 @@ var uuid = require('uuid');
 
 // constant
 const bucketName = "ex1-q2-idc"
-const port = 3000
+const port = 80
 
 // Express server init
 const app = express()
@@ -29,14 +29,40 @@ function chunkArray(myArray, chunk_size){
   return tempArray;
 }
 
+/** 
+* @summary Choose storage class based on precentage of data in STANDARD and STANDARD_IA, If after adding 1 item to STANDARD it will be less
+* Than 20% in STANDARD, else choose STANDARD_ID.
+* @param {Array[object]} content - list of objects in S3.
+* @return {String} Storage class to use.
+*/
 
+function ChooseStorageClass(content){
+  let storageClass = 'STANDARD';
+  let standardClass = 0;
+  let standardIaClass = 0;
+  content.forEach(obj => {
+    if (obj.StorageClass == "STANDARD"){
+      standardClass++;
+    } else if (obj.StorageClass == "STANDARD_IA"){
+      standardIaClass++
+    }
+  });
+
+  let expectedStandardClassPrecentage = (standardClass  + 1 / (standardClass + standardIaClass));
+  if (expectedStandardClassPrecentage > 0.2) {
+      storageClass += "_IA";
+  }
+
+  return storageClass;
+}
 
 // Main page handler
 app.get('/', (req, res) => {
   var params = {
     Bucket: bucketName
   };
-  let x  = s3.listObjects(params, function(err, data) {
+  s3.listObjects(params, function(err, data) {
+    let storageClass = ChooseStorageClass(data.Contents)
     let urls = new Array();
     if (err) {
       console.log(err, err.stack); // an error occurred
@@ -64,7 +90,8 @@ app.get('/', (req, res) => {
     var params = {
       Bucket: bucketName,
       Fields: {
-        key: `${uuid.v4()}.png`
+        key: `${uuid.v4()}.png`,
+        'x-amz-storage-class': storageClass
       }
     };
     s3.createPresignedPost(params, function(err, data) {
@@ -81,9 +108,9 @@ app.get('/', (req, res) => {
           xAmAlgorithm: data.fields['X-Amz-Algorithm'],
           xAmzSignature: data.fields['X-Amz-Signature'],
           xAmzDate: data.fields['X-Amz-Date'],
+          xAmzStorageClass: storageClass,
           policy: data.fields.Policy
         };
-        console.log(generalHtmlParams);
         var html = jsrender.renderFile(process.cwd() + '/myTemplate.html', generalHtmlParams);
         // Page response
         res.send(html);

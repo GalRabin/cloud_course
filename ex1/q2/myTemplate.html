@@ -29,6 +29,8 @@
     <form method="POST" action="https://ex1-q2-idc.s3.amazonaws.com"  enctype="multipart/form-data">
         <label for="input1">Key to upload:</label>
         <br><input type="text"  name="key" value="{{:key}}" id="input1" class="form-control" readonly/>
+        <label for="input8">x-amz-storage-class:</label>
+        <input type="text" name="x-amz-storage-class" value="{{:xAmzStorageClass}}" id="input8" class="form-control" readonly/>
         <label for="input2">X-Amz-Credential:</label>
         <input type="text" name="X-Amz-Credential" value="{{:xAmzCredential}}" id="input2" class="form-control" readonly/>
         <label for="input3">X-Amz-Algorithm:</label>

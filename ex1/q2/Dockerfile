@@ -15,5 +15,8 @@ RUN npm install
 # Bundle app source
 COPY . .
 
+ENV AWS_ACCESS_KEY_ID <Private>
+ENV AWS_SECRET_ACCESS_KEY <Private>
+
 EXPOSE 3000
 CMD [ "node", "server.js" ]

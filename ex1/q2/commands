@@ -1,0 +1,30 @@
+#### Docker image creation ####
+# Image build 
+docker build . -t galrabin/ex2_q2
+
+# Image push to repository
+docker push galrabin/ex2_q2
+
+# Creating cluster
+eksctl create cluster \
+ --name idc-ex1-q2 \
+ --version 1.16 \
+ --without-nodegroup
+
+# Creating Node group
+eksctl create nodegroup \
+--cluster idc-ex1-q2 \
+--version 1.16 \
+--name idc-ex1-q1-node-group \
+--node-type t2.small \
+--nodes 2 \
+--nodes-min 1 \
+--nodes-max 4 \
+--node-ami auto
+
+# Deployment
+kubectl apply -f ex2_q2_deployment.yaml
+
+# Service
+kubectl expose deployment ex1-q2  --type=ClusterIP  --name=ex1-q2-lb
+
