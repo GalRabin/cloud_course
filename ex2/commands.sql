@@ -1,35 +1,45 @@
 /* Create records table */
-CREATE EXTERNAL TABLE `records`(
-  `licenseplate` string COMMENT 'from deserializer', 
-  `sensor` int COMMENT 'from deserializer', 
-  `time` date COMMENT 'from deserializer')
-ROW FORMAT SERDE 
-  'org.openx.data.jsonserde.JsonSerDe' 
-STORED AS INPUTFORMAT 
-  'org.apache.hadoop.mapred.TextInputFormat' 
-OUTPUTFORMAT 
-  'org.apache.hadoop.hive.ql.io.IgnoreKeyTextOutputFormat'
-LOCATION
-  's3://y20s2-ex2/records'
-TBLPROPERTIES (
-  'has_encrypted_data'='false', 
-  'transient_lastDdlTime'='1593339634')
+CREATE EXTERNAL TABLE records (
+  `LicensePlate` string,
+  `Sensor` int,
+  `Time` string
+)
+ROW FORMAT
+SERDE 'org.apache.hadoop.hive.serde2.avro.AvroSerDe'
+WITH SERDEPROPERTIES ('avro.schema.literal' = '
+{"namespace": "example.avro",
+  "type": "record",
+  "name": "Records",
+  "fields": [
+    {"name": "LicensePlate", "type": "string"},
+    {"name": "Sensor",  "type": "int"},
+    {"name": "Time", "type": "string"}
+  ]
+}
+')
+STORED AS AVRO
+LOCATION 's3://idc-ex2/records/';
 
 /* Create sensors table */
-CREATE EXTERNAL TABLE `sensors`(
-  `sensor` int, 
-  `pricing` float)
-ROW FORMAT DELIMITED 
-  FIELDS TERMINATED BY ',' 
-STORED AS INPUTFORMAT 
-  'org.apache.hadoop.mapred.TextInputFormat' 
-OUTPUTFORMAT 
-  'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
-LOCATION
-  's3://y20s2-ex2/sensors'
-TBLPROPERTIES (
-  'has_encrypted_data'='false', 
-  'transient_lastDdlTime'='1593338062')
+CREATE EXTERNAL TABLE sensors (
+  `Sensor` int,
+  `Pricing` float
+)
+ROW FORMAT
+SERDE 'org.apache.hadoop.hive.serde2.avro.AvroSerDe'
+WITH SERDEPROPERTIES ('avro.schema.literal' = '
+{"namespace": "example.avro",
+  "type": "record",
+  "name": "Sensors",
+  "fields": [
+    {"name": "Sensor", "type": "int"},
+    {"name": "Pricing",  "type": "float"}
+  ]
+}
+')
+STORED AS AVRO
+LOCATION 's3://idc-ex2/sensors/';
+
 
 /* Generate sensors report */
 WITH ch AS (
@@ -37,10 +47,10 @@ WITH ch AS (
   r.licenseplate as licenseplate,
   sensor as sensor,
   COUNT(r.sensor) as tolls,
-  date_format(r.time, '%M') as month,
-  date_format(r.time, '%Y') as year
+  date_format(date_parse(r.time, '%Y-%m-%d %h:%i:%i'), '%M') as month,
+  date_format(date_parse(r.time, '%Y-%m-%d %h:%i:%i'), '%Y') as year
   FROM records r
-  GROUP BY r.licenseplate, r.sensor, date_format(r.time, '%M'), date_format(r.time, '%Y')
+  GROUP BY r.licenseplate, r.sensor, date_format(date_parse(r.time, '%Y-%m-%d %h:%i:%i'), '%M'), date_format(date_parse(r.time, '%Y-%m-%d %h:%i:%i'), '%Y')
   ),
   tc AS (
     SELECT
@@ -67,4 +77,4 @@ WITH ch AS (
   
 select *
 FROM final
--- WHERE "License plate"='YUYRB78292';
+WHERE "License plate"='YUYRB78292';
