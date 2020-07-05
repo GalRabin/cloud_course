@@ -42,39 +42,19 @@ LOCATION 's3://idc-ex2/sensors/';
 
 
 /* Generate sensors report */
-WITH ch AS (
-  SELECT 
-  r.licenseplate as licenseplate,
-  sensor as sensor,
-  COUNT(r.sensor) as tolls,
-  date_format(date_parse(r.time, '%Y-%m-%d %h:%i:%i'), '%M') as month,
-  date_format(date_parse(r.time, '%Y-%m-%d %h:%i:%i'), '%Y') as year
-  FROM records r
-  GROUP BY r.licenseplate, r.sensor, date_format(date_parse(r.time, '%Y-%m-%d %h:%i:%i'), '%M'), date_format(date_parse(r.time, '%Y-%m-%d %h:%i:%i'), '%Y')
-  ),
-  tc AS (
-    SELECT
-    ch.licenseplate as licenseplate,
-    ch.sensor AS sensor,
-    ch.tolls AS tolls,
-    ch.tolls*sensors.pricing AS cost,
-    ch.year AS year,
-    ch.month AS month
-    FROM ch, sensors
-    WHERE sensors.sensor=ch.sensor
-  ),
-  final AS (
-    SELECT
-    tc.licenseplate as "License plate",
-    SUM(tc.cost) as "Total cost",
-    tc.month as "Month",
-    tc.year as "Year",
-    SUM(tc.tolls) as "tolls"
-    FROM tc
-    GROUP BY tc.licenseplate, tc.month, tc.year
-    )
- 
-  
+WITH report AS (
+  SELECT LicensePlate as "License plate",
+  SUM(Pricing) as "Total Cost",
+  DATE_FORMAT(date_parse(Time,'%Y-%m-%d %h:%i:%s'),'%m') AS "Month",
+  DATE_FORMAT(date_parse(Time,'%Y-%m-%d %h:%i:%s'),'%Y') AS "Year",
+  count(*) as "Number of tolls"
+  FROM records
+  JOIN sensors ON records.Sensor=sensors.Sensor
+  GROUP BY LicensePlate,
+  DATE_FORMAT(date_parse(Time,'%Y-%m-%d %h:%i:%s'),'%Y'),
+  DATE_FORMAT(date_parse(Time,'%Y-%m-%d %h:%i:%s'),'%m')
+  )
+
 select *
-FROM final
+FROM report
 WHERE "License plate"='YUYRB78292';

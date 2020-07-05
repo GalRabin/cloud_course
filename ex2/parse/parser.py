@@ -1,5 +1,5 @@
 from typing import List, Optional
-from click import Path, command, option
+import click
 from pathlib import Path
 from gzip import open
 from ndjson import load
@@ -132,7 +132,7 @@ def convert_to_avro(content: List[dict], scheme: str, file: Path, dest: Path):
     :param file: file name the file converted from (using it for naming the new file.
     :param dest: destination folder to place the new converted file.
     """
-    schema = avro.schema.parse(open(scheme, "rb").read())
+    schema = avro.schema.parse(Path(scheme).read_text())
     new_file = file.stem
     if '.json.gz' in file.name:
         new_file = ".".join(new_file.split('.')[:-1])
@@ -187,10 +187,10 @@ def creating_folder_structure(dest: str) -> Path:
     return dest
 
 
-@command()
-@option('--src', help='Source folder', type=Path(exists=True, resolve_path=True))
-@option('--dest', help='Conver nd-json gzip files to Avro ', type=Path(exists=True, resolve_path=True))
-@option('--bucket', help='Bucket name to upload converted avro files to')
+@click.command()
+@click.option('--src', help='Source folder', type=click.Path(exists=True, resolve_path=True))
+@click.option('--dest', help='Conver nd-json gzip files to Avro ', type=click.Path(resolve_path=True))
+@click.option('--bucket', help='Bucket name to upload converted avro files to')
 def converter(src: str, dest: str, bucket: str):
     """Simple CLI for converting files in folder to avro files and upload to S3 bucket"""
     dest = creating_folder_structure(dest)
