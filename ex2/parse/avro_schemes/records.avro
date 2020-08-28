@@ -1,9 +1,0 @@
-{"namespace": "example.avro",
-  "type": "record",
-  "name": "Records",
-  "fields": [
-    {"name": "LicensePlate", "type": "string"},
-    {"name": "Sensor",  "type": "int"},
-    {"name": "Time", "type": "string"}
-  ]
-}

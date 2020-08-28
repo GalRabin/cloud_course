@@ -1,0 +1,12 @@
+---
+- name: This is a hello-world example
+  hosts: all
+  tasks:
+    - debug:
+        msg: System {{ python }}
+  roles:
+    - role: pyenv
+      pyenv_global: "{{ python[0] }} system"
+    - role: golang
+      pyenv_global: "{{ golang[0] }}"
+

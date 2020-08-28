@@ -1,8 +1,0 @@
-{"namespace": "example.avro",
-  "type": "record",
-  "name": "Sensors",
-  "fields": [
-    {"name": "Sensor", "type": "int"},
-    {"name": "Pricing",  "type": "float"}
-  ]
-}
