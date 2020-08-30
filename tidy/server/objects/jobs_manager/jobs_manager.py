@@ -35,7 +35,6 @@ class JobManager:
     @classmethod
     def job_status(cls, uuid: str):
         job = Job.get(uuid)
-        if uuid in cls.jobs.keys():
-            return ServerResponseJobManager(job, cls.jobs.get(uuid))
-        else:
-            raise Exception("No such job")
+        runner = cls.jobs[uuid]
+
+        return ServerResponseJobManager(job, runner)
