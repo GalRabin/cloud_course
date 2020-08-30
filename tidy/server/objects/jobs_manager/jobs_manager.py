@@ -7,10 +7,6 @@ from objects.job.job import Job
 from objects.jobs_manager.response import ServerResponseJobManager
 from utils.common import get_src_root
 
-import logging
-
-logger = logging.getLogger(__name__)
-
 
 class JobManager:
     jobs: Dict[str, Runner] = {}
@@ -42,4 +38,4 @@ class JobManager:
         if f"{job.profile.uuid}-{job.user.uuid}" in cls.jobs.keys():
             return ServerResponseJobManager(job, cls.jobs.get(f"{job.profile.uuid}-{job.user.uuid}"))
         else:
-            return "No such job"
+            raise Exception("No such job")

@@ -106,7 +106,12 @@ def job_execute(uuid: str):
 
 @APP.route(f'/{API_VERSION}/job/status/<uuid>', methods=['GET'])
 def job_status(uuid: str):
-    return handle_response(JobManager.job_status(uuid))
+    try:
+        res = JobManager.job_status(uuid)
+    except Exception:
+        return make_response(f"Job {uuid} not executed yet", 500)
+
+    return handle_response(res)
 
 
 if __name__ == '__main__':
