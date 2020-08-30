@@ -7,6 +7,12 @@
 
 ## Description
 
+Tidy project is a SAS solution which allow enterprise to install/update/fix existing employees development enviorment.
+
+###Terminology:
+ - **Users** – User is configuration of PCs in the organization. (Username, Password, IP in VPN).
+ - **Profiles** – Profile is configuration of set of tools used by specific Employee/Team in enterprise. (IDEs,  - git/svn etc)
+ - **Jobs** – Jon is configuration of profile and user combined (User is part of specific team or multiple)
 
 
 ## API documentation
