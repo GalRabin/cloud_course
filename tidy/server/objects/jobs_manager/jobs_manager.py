@@ -10,6 +10,8 @@ from utils.common import get_src_root
 import logging
 
 logger = logging.getLogger(__name__)
+
+
 class JobManager:
     jobs: Dict[str, Runner] = {}
 
@@ -23,7 +25,6 @@ class JobManager:
                                                             f"ansible_user={job.user.username} ansible_password={job.user.password}",
                                                   verbosity=2,
                                                   extravars=job.profile.to_dict(True))
-        logger.info(get_src_root() / 'ansible')
 
         return thread, runner
 
@@ -38,14 +39,7 @@ class JobManager:
     @classmethod
     def job_status(cls, uuid: str):
         job = Job.get(uuid)
-        config = RunnerConfig(private_data_dir=str(get_src_root() / 'ansible'),
-                              ident=f"{job.profile.uuid}-{job.user.uuid}",
-                              playbook='playbook.yml',
-                              roles_path='roles',
-                              inventory=f"{job.user.uuid} ansible_host={job.user.hostname} "
-                                        f"ansible_user={job.user.username} ansible_password={job.user.password}",
-                              verbosity=2,
-                              extravars=job.profile.to_dict(True))
-        runner = Runner(config)
-
-        return ServerResponseJobManager(job, runner)
+        if f"{job.profile.uuid}-{job.user.uuid}" in cls.jobs.keys():
+            return ServerResponseJobManager(job, cls.jobs.get(f"{job.profile.uuid}-{job.user.uuid}"))
+        else:
+            return "No such job"
