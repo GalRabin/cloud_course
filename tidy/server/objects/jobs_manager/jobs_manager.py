@@ -35,7 +35,7 @@ class JobManager:
     @classmethod
     def job_status(cls, uuid: str):
         job = Job.get(uuid)
-        if f"{job.profile.uuid}-{job.user.uuid}" in cls.jobs.keys():
+        if uuid in cls.jobs.keys():
             return ServerResponseJobManager(job, cls.jobs.get(f"{job.profile.uuid}-{job.user.uuid}"))
         else:
             raise Exception("No such job")
