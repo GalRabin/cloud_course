@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tidy
+  labels:
+    app: tidy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tidy
+  template:
+    metadata:
+      labels:
+         app: tidy
+    spec:
+      containers:
+      - name: server
+        image: galrabin/tidy
+        ports:
+        - containerPort: 8000
+        resources: {}
+
+      - name: openvpn-as
+        image: linuxserver/openvpn-as
+        env:
+        - name: INTERFACE
+          value: eth0
+        - name: PGID
+          value: "1000"
+        - name: PUID
+          value: "1000"
+        - name: TZ
+          value: Europe/London
+        ports:
+        - containerPort: 943
+        - containerPort: 9443
+        - containerPort: 1194
+          protocol: UDP
+        resources: {}
+        securityContext:
+          capabilities:
+            add:
+            - NET_ADMIN
+        volumeMounts:
+        - mountPath: /config
+          name: persist-volume
+
+      volumes:
+      - name: persist-volume
+        persistentVolumeClaim:
+          claimName: persist-volume
+
+status: {}

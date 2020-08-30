@@ -1,0 +1,21 @@
+- name: Creates Goenv directory
+  file:
+    path: ~/.goenv
+    state: directory
+
+- name: Clone goenv repo to ~/.goenv/goenv
+  git:
+    accept_hostkey: yes
+    repo: https://github.com/syndbg/goenv.git
+    dest: ~/.goenv
+    update: yes
+    force: yes
+
+- name: Install go versions
+  shell:
+    cmd: ". ~/.bash_profile && goenv install {{ item }}"
+  loop: "{{ golang }}"
+
+- name: Setup global go version
+  shell:
+    cmd: ". ~/.bash_profile && goenv global {{ goenv_global }}"

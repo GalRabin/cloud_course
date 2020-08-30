@@ -1,9 +1,0 @@
-version: '2.0'
-services:
-  server:
-    image: galrabin/final_project:1.2
-    user: root
-    ports:
-      - "8000:8000"
-    volumes:
-      - $HOME/.aws:/home/app/.aws/
