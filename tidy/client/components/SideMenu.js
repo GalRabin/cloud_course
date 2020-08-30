@@ -11,6 +11,7 @@ import { Avatar } from "@material-ui/core";
 import { Grid } from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 
+const logoPath = "../tidy.png";
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
@@ -52,7 +53,7 @@ function SideMenu(props) {
         <Avatar
           // src="https://helpx.adobe.com/content/dam/help/en/stock/how-to/visual-reverse-image-search/jcr_content/main-pars/image/visual-reverse-image-search-v2_intro.jpg"
           className={classes.bigAvatar}
-          src="https://i.pinimg.com/originals/85/71/ac/8571ac03955f44ea2bb5451325f63dda.png"
+          src="https://raw.githubusercontent.com/GalRabin/cloud_course/master/tidy/docs/tidy-logo.png"
         />
       </Grid>
 

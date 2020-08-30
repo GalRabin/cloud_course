@@ -36,7 +36,8 @@ export default function AllUsers() {
   };
 
   const getJobs = () => {
-    const path = "http://127.0.0.1:8000/api/v1/list-jobs";
+    const path =
+      "http://a9aa3c6e4fada42ba85d935333a18ce5-1740582443.us-east-2.elb.amazonaws.com:8000/api/v1/list-jobs";
     axios({
       url: path,
       method: "get",
@@ -54,7 +55,8 @@ export default function AllUsers() {
   };
 
   const getUsers = () => {
-    const path = "http://127.0.0.1:8000/api/v1/list-users";
+    const path =
+      "http://a9aa3c6e4fada42ba85d935333a18ce5-1740582443.us-east-2.elb.amazonaws.com:8000/api/v1/list-users";
     axios({
       url: path,
       method: "get",
@@ -72,7 +74,8 @@ export default function AllUsers() {
   };
 
   const getProfiles = () => {
-    const path = "http://127.0.0.1:8000/api/v1/list-profiles";
+    const path =
+      "http://a9aa3c6e4fada42ba85d935333a18ce5-1740582443.us-east-2.elb.amazonaws.com:8000/api/v1/list-profiles";
     axios({
       url: path,
       method: "get",

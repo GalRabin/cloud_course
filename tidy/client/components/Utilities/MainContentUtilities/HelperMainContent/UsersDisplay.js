@@ -122,12 +122,13 @@ function UserDisplay(props) {
 
   useEffect(() => {
     setData(props.users);
-  }, []);
+    console.log("props.users -> ", props.users);
+  }, [props.users]);
 
   if (data) {
     return (
       <Styles>
-        <Table columns={columns} data={props.users} />
+        <Table columns={columns} data={data} />
       </Styles>
     );
   } else {

@@ -66,7 +66,8 @@ export default function AddJob(props) {
     // await sleep(300);
     try {
       const jobToAdd = createJobToAdd();
-      const path = "http://127.0.0.1:8000/api/v1/job";
+      const path =
+        "http://a9aa3c6e4fada42ba85d935333a18ce5-1740582443.us-east-2.elb.amazonaws.com:8000/api/v1/job";
 
       await axios
         .post(path, jobToAdd)

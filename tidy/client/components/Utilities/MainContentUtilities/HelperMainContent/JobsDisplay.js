@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useTable, useSortBy } from "react-table";
-
+// import { ExecuteJob } from "../../../API";
+import axios from "axios";
 const Styles = styled.div`
   padding: 1rem;
 
@@ -113,12 +114,71 @@ function ProfilesDisplay(props) {
     []
   );
 
+  const ExecuteJob = async (job_uuid) => {
+    const method = "job/execute/" + job_uuid;
+    const myPath =
+      "http://a9aa3c6e4fada42ba85d935333a18ce5-1740582443.us-east-2.elb.amazonaws.com:8000/api/v1/job/execute/";
+
+    let complete = myPath + job_uuid;
+    await axios({
+      url: complete,
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => {
+        alert("job " + job_uuid + " Sucssefully initiated");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const StatusJob = async (job_uuid) => {
+    // const method = "job/execute/" + job_uuid;
+    const myPath =
+      "http://a9aa3c6e4fada42ba85d935333a18ce5-1740582443.us-east-2.elb.amazonaws.com:8000/api/v1/job/status/";
+
+    let complete = myPath + job_uuid;
+    console.log("this is compl -> ", complete);
+    let data = await axios({
+      url: complete,
+      method: "get",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => {
+        let msg = JSON.stringify(response, 0, 2);
+
+        // alert("job " + job_uuid + " Sucssefully initiated");
+        alert(msg);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    if (data) {
+      return data;
+    }
+  };
+  const executeAndStatus = props.jobs.map((job, index) => {
+    return (
+      <div>
+        <button onClick={() => ExecuteJob(job.uuid)}>Execute {job.uuid}</button>
+        <button onClick={() => StatusJob(job.uuid)}>Stats {job.uuid}</button>
+      </div>
+    );
+  });
   // console.log("props.jobs -> ", );
   // console.log("jobs as data ->", props.jobs);
   return (
-    <Styles>
-      <Table columns={columns} data={props.jobs} />
-    </Styles>
+    <div>
+      <Styles>
+        <Table columns={columns} data={props.jobs} />
+      </Styles>
+      <div> {executeAndStatus}</div>
+    </div>
   );
 }
 
