@@ -108,8 +108,8 @@ def job_execute(uuid: str):
 def job_status(uuid: str):
     try:
         res = JobManager.job_status(uuid)
-    except Exception:
-        return make_response(f"Job {uuid} not executed yet", 500)
+    except Exception as e:
+        return make_response(str(e), 500)
 
     return handle_response(res)
 
